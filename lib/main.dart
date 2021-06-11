@@ -30,11 +30,10 @@ class App extends StatelessWidget {
         darkTheme: darkTheme,
         debugShowCheckedModeBanner: false,
         builder: (context, nativeNavigator) {
-          return ExtendedNavigator.builder<AppRouter>(
-            router: AppRouter(),
-            name: 'topNav',
-            builder: (context, child) => child,
-          )(context, nativeNavigator);
+          return MaterialApp.router(
+            routerDelegate: appRouter.delegate(),
+            routeInformationParser: appRouter.defaultRouteParser(),
+          );
         },
       ),
     );

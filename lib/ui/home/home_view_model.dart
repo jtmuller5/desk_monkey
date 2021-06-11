@@ -33,14 +33,14 @@ class HomeViewModel extends ReactiveViewModel with WidgetsBindingObserver {
   }
 
   void initialize() {
-    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance?.addObserver(this);
   }
 
   void startListening() {
     speechService.startListening(resultCallback: (result) {
       print('Recognized words: ' + result.recognizedWords);
 
-      if (result.recognizedWords != null) {
+      if (result.recognizedWords.isNotEmpty) {
         recognizedWords = result.recognizedWords;
         notifyListeners();
       }
@@ -52,7 +52,7 @@ class HomeViewModel extends ReactiveViewModel with WidgetsBindingObserver {
   @override
   void dispose() {
     speechService.stopListeningForWakeWord();
-    WidgetsBinding.instance.removeObserver(this);
+    WidgetsBinding.instance?.removeObserver(this);
     super.dispose();
   }
 

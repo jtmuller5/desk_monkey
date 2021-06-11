@@ -11,9 +11,9 @@ import 'package:wakelock/wakelock.dart';
 class SpeechService with ReactiveServiceMixin {
   bool speechAvailable = false;
   stt.SpeechToText speech = stt.SpeechToText();
-  PorcupineManager porcupineManager;
+  PorcupineManager? porcupineManager;
 
-  Function(SpeechRecognitionResult result) contextCallback;
+  Function(SpeechRecognitionResult result)? contextCallback;
 
   /// Initialization function called when the app is first opened
   Future<void> initializeSpeechService() async {
@@ -24,7 +24,7 @@ class SpeechService with ReactiveServiceMixin {
         print('Speech to text status: ' + status);
 
         // Need to restart PorcupineManager if there is no detection
-        if(speech.isNotListening){
+        if (speech.isNotListening) {
           await listenForWakeWord();
         }
       },
@@ -37,27 +37,26 @@ class SpeechService with ReactiveServiceMixin {
     listenForWakeWord();
   }
 
-  void setContextCallback(Function(SpeechRecognitionResult result) callback){
+  void setContextCallback(Function(SpeechRecognitionResult result) callback) {
     contextCallback = callback;
     notifyListeners();
   }
 
   /// Start listening for user input
   /// resultCallback is optionally specified by the caller
-  Future<void> startListening({Function(SpeechRecognitionResult result) resultCallback}) async {
+  Future<void> startListening({Function(SpeechRecognitionResult result)? resultCallback}) async {
     if (speechAvailable) {
-      await porcupineManager.stop();
+      await porcupineManager?.stop();
       await speech.listen(
-        partialResults: false,
-        onResult: (result) async {
-          print('Speech to text result: ' + result.recognizedWords);
-          if (resultCallback != null) resultCallback(result); // Specified from caller
-          if (contextCallback != null) contextCallback(result); // Set in SpeechService
-          await listenForWakeWord();
-          notifyListeners();
-        },
-        cancelOnError: true
-      );
+          partialResults: false,
+          onResult: (result) async {
+            print('Speech to text result: ' + result.recognizedWords);
+            if (resultCallback != null) resultCallback(result); // Specified from caller
+            if (contextCallback != null) contextCallback!(result); // Set in SpeechService
+            await listenForWakeWord();
+            notifyListeners();
+          },
+          cancelOnError: true);
       notifyListeners();
     } else {
       print("The user has denied the use of speech recognition.");
@@ -76,7 +75,7 @@ class SpeechService with ReactiveServiceMixin {
       porcupineManager = await PorcupineManager.fromKeywords(Porcupine.BUILT_IN_KEYWORDS, wakeWordCallback);
     } on PvError catch (err) {
       // handle porcupine init error
-      print('Porcupine error: ' + err.message);
+      print('Porcupine error: ' + (err.message ?? 'None'));
     }
   }
 
@@ -98,27 +97,27 @@ class SpeechService with ReactiveServiceMixin {
   /// Begin listening for a wake word
   Future<void> listenForWakeWord() async {
     try {
-      await porcupineManager.start();
+      await porcupineManager?.start();
     } on PvAudioException catch (ex) {
       // deal with either audio exception
-      print('PvAudioException: ' + ex.message);
+      print('PvAudioException: ' + (ex.message ?? 'None'));
     }
   }
 
   Future<void> stopListeningForWakeWord() async {
     print('Stopping wake word listener');
-    await porcupineManager.stop();
+    await porcupineManager?.stop();
   }
 
   Future<void> disposeResources() async {
     print('Disposing speech resources');
-    porcupineManager.delete();
+    porcupineManager?.delete();
     await speech.cancel();
     await speech.stop();
   }
 
   /// Keep the screen on while the voice recognition screen is open
-  void setWakelock(bool val){
-    val? Wakelock.enable() : Wakelock.disable();
+  void setWakelock(bool val) {
+    val ? Wakelock.enable() : Wakelock.disable();
   }
 }

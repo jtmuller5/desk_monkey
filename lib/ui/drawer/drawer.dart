@@ -1,5 +1,5 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:desk_monkey/app/app_router.gr.dart';
+import 'package:desk_monkey/services/services.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -21,8 +21,8 @@ class NavDrawer extends StatelessWidget {
                   title: Text('Single Command'),
                   onTap: () async {
                     //ExtendedNavigator.named('topNav').pop();
-                    ExtendedNavigator.root.push(
-                      Routes.singleCommandView,
+                    appRouter.push(
+                      SingleCommandViewRoute(),
                     );
                   },
                 ),
